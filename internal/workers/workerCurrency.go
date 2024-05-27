@@ -4,8 +4,8 @@ import (
 	"context"
 	currencyapi "goTest/internal/infrastructure/currencyApi"
 	"goTest/internal/modules/currency/storage"
+	"time"
 
-	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
 )
 
@@ -14,25 +14,45 @@ var (
 	currStr storage.CurrencyStorage
 )
 
-func InitWorkerCurrency(log *zap.Logger, valuteStor storage.CurrencyStorage) {
-	c := cron.New(cron.WithSeconds())
-	logger = log
-	currStr = valuteStor
-	log.Info("workerCurrency init")
-	_, err := c.AddFunc("0 0 10 * * ?", writeInfoToDb)
+func callAt(hour, min, sec int, f func()) error {
+	loc, err := time.LoadLocation("Local")
 	if err != nil {
-		log.Fatal("could not schedule task:", zap.Error(err))
+		return err
 	}
-	c.Start()
+
+	now := time.Now().Local()
+	firstCallTime := time.Date(
+		now.Year(), now.Month(), now.Day(), hour, min, sec, 0, loc)
+	if firstCallTime.Before(now) {
+		firstCallTime = firstCallTime.Add(time.Hour * 24)
+	}
+
+	duration := firstCallTime.Sub(time.Now().Local())
+
+	go func() {
+		time.Sleep(duration)
+		for {
+			f()
+			time.Sleep(time.Hour * 24)
+		}
+	}()
+
+	return nil
+}
+
+func InitWorkerCurrency(logg *zap.Logger, st storage.CurrencyStorage) {
+	logger = logg
+	currStr = st
+	err := callAt(10, 0, 0, writeInfoToDb)
+	if err != nil {
+		logger.Fatal("can not to init CurrencyWorker", zap.Error(err))
+	}
 }
 
 func writeInfoToDb() {
 
 	ctx := context.Background()
 
-	// select {
-	// case <-ctx.Done():
-	// default:
 	currencies, err := currencyapi.GetCurrencyByToday()
 	if err != nil {
 		logger.Error("can not get api", zap.Error(err))
@@ -44,6 +64,5 @@ func writeInfoToDb() {
 			logger.Error("can not write to db", zap.Error(err))
 		}
 	}
-	logger.Info("make the work")
-	// }
+	logger.Info("made the work")
 }
