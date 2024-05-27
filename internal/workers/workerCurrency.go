@@ -4,6 +4,7 @@ import (
 	"context"
 	currencyapi "goTest/internal/infrastructure/currencyApi"
 	"goTest/internal/modules/currency/storage"
+	"log"
 	"time"
 
 	"go.uber.org/zap"
@@ -28,6 +29,8 @@ func callAt(hour, min, sec int, f func()) error {
 	}
 
 	duration := firstCallTime.Sub(time.Now().Local())
+
+	log.Println(duration)
 
 	go func() {
 		time.Sleep(duration)
