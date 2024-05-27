@@ -9,4 +9,8 @@ type Controllers struct {
 	Currency cHandler.CurrencyHandler
 }
 
-func NewControllers(services *Services, components *component.Components) *Controllers
+func NewControllers(services *Services, components *component.Components) *Controllers {
+	return &Controllers{
+		Currency: cHandler.NewCurrencyHandler(services.Service, components),
+	}
+}

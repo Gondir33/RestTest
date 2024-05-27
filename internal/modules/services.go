@@ -10,4 +10,8 @@ type Services struct {
 	Service cService.CurrencyService
 }
 
-func NewServices(storages *storages.Storages, components *component.Components) *Services
+func NewServices(storages *storages.Storages, components *component.Components) *Services {
+	return &Services{
+		Service: cService.NewCurrencyService(storages.CurrencyStorage, components),
+	}
+}

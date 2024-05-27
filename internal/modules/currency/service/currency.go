@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"goTest/internal/infrastructure/component"
+	currencyapi "goTest/internal/infrastructure/currencyApi"
 	"goTest/internal/infrastructure/godecoder"
 	"goTest/internal/models"
 	"goTest/internal/modules/currency/storage"
@@ -10,6 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
+//go:generate mockgen -source=currency.go -destination=mocks/currency_mock.go
 type CurrencyService interface {
 	GetCurrency(ctx context.Context, date, currencyName string) (models.Currency, error)
 }
@@ -28,4 +31,12 @@ func NewCurrencyService(CurrencyRep storage.CurrencyStorage, components *compone
 	}
 }
 
-func (c *Currency) GetCurrency(ctx context.Context, date, currencyName string) (models.Currency, error)
+func (c *Currency) GetCurrency(ctx context.Context, date, currencyName string) (models.Currency, error) {
+
+	select {
+	case <-ctx.Done():
+		return models.Currency{}, fmt.Errorf("a lot of wait time of api")
+	default:
+		return currencyapi.GetCurrencyByNameDate(date, currencyName)
+	}
+}

@@ -9,7 +9,9 @@ import (
 	"goTest/internal/infrastructure/router"
 	"goTest/internal/infrastructure/server"
 	"goTest/internal/modules"
+	"goTest/internal/modules/currency/storage"
 	"goTest/internal/storages"
+	"goTest/internal/workers"
 	"net/http"
 	"os"
 
@@ -103,7 +105,9 @@ func (a *App) Bootstrap(options ...interface{}) Runner {
 	}
 
 	// инициализация хранилищ
-	newStorages := storages.NewStorages(pool)
+	newStorages := storages.NewStorages(storage.NewCurrencyStorage(pool))
+
+	workers.InitWorkerCurrency(logger, newStorages.CurrencyStorage)
 
 	a.Storages = newStorages
 	// инициализация сервисов

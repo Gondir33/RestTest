@@ -1,0 +1,49 @@
+basePath: /
+definitions:
+  models.Currency:
+    properties:
+      model:
+        type: string
+      value:
+        type: number
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server for goTest Application
+  title: goTest
+  version: "1.0"
+paths:
+  /currency:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 'example: 02/03/2002'
+        in: query
+        name: date
+        type: string
+      - description: 'example: USD'
+        in: query
+        name: val
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Currency'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: GetCurrencys with date and val
+      tags:
+      - Currency
+swagger: "2.0"

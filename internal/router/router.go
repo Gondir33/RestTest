@@ -12,7 +12,7 @@ func NewApiRouter(controllers *modules.Controllers, components *component.Compon
 	r := chi.NewRouter()
 
 	r.Group(func(r chi.Router) {
-		r.Get("/car", controllers.Currency.GetCurrency)
+		r.Get("/currency", controllers.Currency.GetCurrency)
 	})
 	return r
 }

@@ -21,6 +21,7 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("no .env files found")
 	}
+
 	// Создаем конфигурацию приложения
 	conf := config.NewAppConf()
 	// Создаем инстанс приложения
