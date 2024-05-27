@@ -1,1 +1,2 @@
-External APi URL in .env file
+run cmd docker compose up
+or bash build.sh
